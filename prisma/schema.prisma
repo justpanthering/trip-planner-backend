@@ -14,8 +14,104 @@ datasource db {
 }
 
 model User {
-  id          String   @id @default(uuid())
-  firebaseUid String   @unique
+  id          String       @id @default(uuid())
+  firebaseUid String       @unique
   email       String
-  createdAt   DateTime @default(now())
+  createdAt   DateTime     @default(now())
+  tripMembers TripMember[]
+}
+
+model Trip {
+  id        String   @id @default(uuid())
+  name      String
+  startDate DateTime
+  endDate   DateTime
+  currency  String // for budget only
+  budget    Decimal? @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+
+  members      TripMember[]
+  destinations Destination[]
+  days         TripDay[]
+}
+
+model TripMember {
+  id       String   @id @default(uuid())
+  role     TripRole
+  joinedAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  trip   Trip   @relation(fields: [tripId], references: [id])
+  tripId String
+
+  @@unique([userId, tripId])
+}
+
+enum TripRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+model Destination {
+  id        String   @id @default(uuid())
+  name      String // e.g. Paris
+  country   String?
+  order     Int // visit order
+  createdAt DateTime @default(now())
+
+  trip   Trip   @relation(fields: [tripId], references: [id])
+  tripId String
+
+  days TripDay[]
+}
+
+model TripDay {
+  id        String   @id @default(uuid())
+  date      DateTime
+  dayNumber Int
+  createdAt DateTime @default(now())
+
+  trip   Trip   @relation(fields: [tripId], references: [id])
+  tripId String
+
+  destination   Destination? @relation(fields: [destinationId], references: [id])
+  destinationId String?
+
+  items ItineraryItem[]
+}
+
+model ItineraryItem {
+  id          String        @id @default(uuid())
+  type        ItineraryType
+  title       String
+  description String?
+  startTime   DateTime?
+  endTime     DateTime?
+  order       Int
+  createdAt   DateTime      @default(now())
+
+  day      TripDay         @relation(fields: [dayId], references: [id])
+  dayId    String
+  activity ActivityDetail?
+}
+
+enum ItineraryType {
+  TRAVEL
+  STAY
+  ACTIVITY
+  FOOD
+  NOTE
+}
+
+model ActivityDetail {
+  id         String  @id @default(uuid())
+  location   String?
+  bookingUrl String?
+  ticketRef  String?
+
+  item   ItineraryItem @relation(fields: [itemId], references: [id])
+  itemId String        @unique
 }
