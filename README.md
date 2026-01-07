@@ -67,6 +67,39 @@ npm start
   - Returns: Current user object
   - Note: User is automatically created/updated in database on first authenticated request
 
+### Trips
+
+- `GET /api/trips` - Get list of trips for the authenticated user (protected)
+  - Headers: `Authorization: Bearer <FIREBASE_ID_TOKEN>`
+  - Query Parameters:
+    - `page` (optional): Page number (default: 1, minimum: 1)
+    - `limit` (optional): Number of items per page (default: 20, minimum: 1, maximum: 100)
+  - Returns: Paginated array of trips with basic information
+  - Response format:
+    ```json
+    {
+      "trips": [
+        {
+          "id": "uuid",
+          "name": "Trip Name",
+          "startDate": "2024-01-01T00:00:00.000Z",
+          "endDate": "2024-01-07T00:00:00.000Z",
+          "role": "OWNER" | "EDITOR" | "VIEWER"
+        }
+      ],
+      "pagination": {
+        "page": 1,
+        "limit": 20,
+        "totalCount": 45,
+        "totalPages": 3,
+        "hasNextPage": true,
+        "hasPreviousPage": false
+      }
+    }
+    ```
+  - Returns trips ordered by creation date (newest first)
+  - Example: `GET /api/trips?page=1&limit=20`
+
 ### Health Check
 
 - `GET /health` - Health check endpoint
@@ -128,5 +161,6 @@ src/
 ├── middleware/
 │   └── auth.ts       # Authentication middleware
 └── routes/
-    └── auth.ts       # Authentication routes
+    ├── auth.ts       # Authentication routes
+    └── trips.ts      # Trip routes
 ```
