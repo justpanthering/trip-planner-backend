@@ -8,6 +8,7 @@ import prisma from "../lib/prisma.js";
 interface TripListQuery {
   page?: string;
   limit?: string;
+  status?: "upcoming" | "ongoing" | "past";
 }
 
 export async function tripRoutes(fastify: FastifyInstance) {
@@ -31,18 +32,56 @@ export async function tripRoutes(fastify: FastifyInstance) {
         );
         const skip = (page - 1) * limit;
 
+        // Build date filter based on status
+        const now = new Date();
+        let dateFilter: any = {};
+
+        if (request.query.status) {
+          switch (request.query.status) {
+            case "upcoming":
+              dateFilter = {
+                startDate: {
+                  gt: now,
+                },
+              };
+              break;
+            case "ongoing":
+              dateFilter = {
+                startDate: {
+                  lte: now,
+                },
+                endDate: {
+                  gte: now,
+                },
+              };
+              break;
+            case "past":
+              dateFilter = {
+                endDate: {
+                  lt: now,
+                },
+              };
+              break;
+          }
+        }
+
+        // Build where clause with optional date filter
+        const whereClause: any = {
+          userId: userId,
+        };
+
+        if (Object.keys(dateFilter).length > 0) {
+          whereClause.trip = dateFilter;
+        }
+
         // Get total count for pagination metadata
         const totalCount = await prisma.tripMember.count({
-          where: {
-            userId: userId,
-          },
+          where: whereClause,
         });
 
         // Get paginated trips where the user is a member
         const tripMembers = await prisma.tripMember.findMany({
-          where: {
-            userId: userId,
-          },
+          where: whereClause,
           select: {
             role: true,
             trip: {

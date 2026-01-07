@@ -74,6 +74,7 @@ npm start
   - Query Parameters:
     - `page` (optional): Page number (default: 1, minimum: 1)
     - `limit` (optional): Number of items per page (default: 20, minimum: 1, maximum: 100)
+    - `status` (optional): Filter trips by status - `upcoming` (startDate > today), `ongoing` (startDate <= today AND endDate >= today), or `past` (endDate < today)
   - Returns: Paginated array of trips with basic information
   - Response format:
     ```json
@@ -98,7 +99,12 @@ npm start
     }
     ```
   - Returns trips ordered by creation date (newest first)
-  - Example: `GET /api/trips?page=1&limit=20`
+  - Examples:
+    - `GET /api/trips?page=1&limit=20` - Get all trips
+    - `GET /api/trips?status=upcoming` - Get upcoming trips
+    - `GET /api/trips?status=ongoing` - Get ongoing trips
+    - `GET /api/trips?status=past` - Get past trips
+    - `GET /api/trips?status=upcoming&page=1&limit=10` - Get paginated upcoming trips
 
 ### Health Check
 
