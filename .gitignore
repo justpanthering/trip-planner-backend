@@ -1,5 +1,10 @@
 node_modules
 
+# Prisma generated files
 /generated/prisma
 
+# Environment variables
 .env*
+
+# Firebase service account
+firebase-service.json

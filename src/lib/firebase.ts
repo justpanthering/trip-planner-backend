@@ -1,24 +1,23 @@
 import admin from "firebase-admin";
 import { initializeApp, getApps, cert } from "firebase-admin/app";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 // Initialize Firebase Admin if not already initialized
 if (getApps().length === 0) {
-  const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
-
-  if (!serviceAccount) {
-    throw new Error(
-      "FIREBASE_SERVICE_ACCOUNT environment variable is required"
-    );
-  }
-
   try {
-    const serviceAccountJson = JSON.parse(serviceAccount);
+    const serviceAccountPath = join(process.cwd(), "firebase-service.json");
+    const serviceAccountJson = JSON.parse(
+      readFileSync(serviceAccountPath, "utf-8")
+    );
     initializeApp({
       credential: cert(serviceAccountJson),
     });
   } catch (error) {
     throw new Error(
-      "Invalid FIREBASE_SERVICE_ACCOUNT JSON. Please provide a valid service account JSON string."
+      `Failed to initialize Firebase Admin: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }. Please ensure firebase-service.json exists in the project root.`
     );
   }
 }

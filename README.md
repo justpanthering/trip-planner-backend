@@ -28,17 +28,19 @@ npm install
 Create a `.env` file in the root directory:
 ```env
 DATABASE_URL="postgresql://user:password@localhost:5432/trip_planner?schema=public"
-FIREBASE_SERVICE_ACCOUNT='{"type":"service_account","project_id":"your-project-id",...}'
 PORT=3000
 HOST=0.0.0.0
 ```
 
-3. Generate Prisma client:
+3. Set up Firebase service account:
+Place your Firebase service account JSON file as `firebase-service.json` in the root directory of the project.
+
+4. Generate Prisma client:
 ```bash
 npx prisma generate
 ```
 
-4. Run database migrations:
+5. Run database migrations:
 ```bash
 npx prisma migrate dev
 ```
