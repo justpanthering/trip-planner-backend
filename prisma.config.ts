@@ -9,6 +9,7 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    // Non-null assertion because Prisma requires a string URL here; ensure DATABASE_URL is set at runtime.
+    url: process.env["DATABASE_URL"]!,
   },
 });
